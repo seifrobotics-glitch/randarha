@@ -1,0 +1,894 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Khaled AI Agency</title>
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, Helvetica, sans-serif;
+            background:
+                radial-gradient(
+                    circle at top,
+                    #252525 0%,
+                    #111111 45%,
+                    #080808 100%
+                );
+            color: white;
+            min-height: 100vh;
+        }
+
+        .container {
+            width: min(1200px, 94%);
+            margin: auto;
+            padding: 35px 0 60px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 35px;
+        }
+
+        .header h1 {
+            font-size: 42px;
+            margin: 0 0 10px;
+            letter-spacing: -1px;
+        }
+
+        .header p {
+            margin: 0;
+            color: #aaa;
+            font-size: 16px;
+        }
+
+        .main-card {
+            background: rgba(25, 25, 25, 0.92);
+            border: 1px solid #333;
+            border-radius: 24px;
+            padding: 25px;
+            box-shadow: 0 20px 70px rgba(0, 0, 0, 0.45);
+        }
+
+        .upload-area {
+            border: 2px dashed #555;
+            border-radius: 18px;
+            min-height: 280px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            cursor: pointer;
+            transition: 0.2s;
+            overflow: hidden;
+            position: relative;
+            background: #151515;
+        }
+
+        .upload-area:hover {
+            border-color: #999;
+            background: #1b1b1b;
+        }
+
+        .upload-content {
+            padding: 30px;
+        }
+
+        .upload-icon {
+            font-size: 55px;
+            margin-bottom: 10px;
+        }
+
+        .upload-title {
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+
+        .upload-subtitle {
+            color: #999;
+            font-size: 14px;
+        }
+
+        #imageInput {
+            display: none;
+        }
+
+        #preview {
+            display: none;
+            width: 100%;
+            max-height: 450px;
+            object-fit: contain;
+            background: #080808;
+        }
+
+        .remove-image {
+            display: none;
+            position: absolute;
+            right: 15px;
+            top: 15px;
+            border: none;
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 18px;
+        }
+
+        .section {
+            margin-top: 25px;
+        }
+
+        .section-title {
+            font-size: 15px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #ddd;
+        }
+
+        textarea {
+            width: 100%;
+            min-height: 120px;
+            resize: vertical;
+            background: #101010;
+            border: 1px solid #3a3a3a;
+            border-radius: 14px;
+            color: white;
+            padding: 15px;
+            font-size: 15px;
+            outline: none;
+        }
+
+        textarea:focus {
+            border-color: #777;
+        }
+
+        .optional {
+            color: #777;
+            font-weight: normal;
+            font-size: 12px;
+        }
+
+        .tools {
+            display: grid;
+            grid-template-columns: repeat(
+                auto-fit,
+                minmax(150px, 1fr)
+            );
+            gap: 10px;
+        }
+
+        .tool-button {
+            border: 1px solid #3a3a3a;
+            background: #171717;
+            color: #ddd;
+            border-radius: 12px;
+            padding: 13px 10px;
+            cursor: pointer;
+            transition: 0.2s;
+            font-size: 13px;
+        }
+
+        .tool-button:hover {
+            background: #262626;
+            border-color: #666;
+        }
+
+        .tool-button.active {
+            background: white;
+            color: black;
+            border-color: white;
+            font-weight: bold;
+        }
+
+        .generate {
+            margin-top: 25px;
+            width: 100%;
+            padding: 17px;
+            border: none;
+            border-radius: 14px;
+            background: white;
+            color: black;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .generate:hover {
+            transform: translateY(-1px);
+            background: #ddd;
+        }
+
+        .generate:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .status {
+            margin-top: 15px;
+            text-align: center;
+            color: #aaa;
+            min-height: 20px;
+        }
+
+        .result {
+            margin-top: 30px;
+            display: none;
+        }
+
+        .result-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .result-title {
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .copy-button {
+            border: 1px solid #444;
+            background: #181818;
+            color: white;
+            border-radius: 10px;
+            padding: 9px 15px;
+            cursor: pointer;
+        }
+
+        .copy-button:hover {
+            background: #282828;
+        }
+
+        #resultText {
+            white-space: pre-wrap;
+            background: #0b0b0b;
+            border: 1px solid #333;
+            border-radius: 15px;
+            padding: 20px;
+            line-height: 1.7;
+            font-size: 14px;
+            min-height: 250px;
+            overflow-x: auto;
+        }
+
+        .footer {
+            text-align: center;
+            color: #555;
+            margin-top: 30px;
+            font-size: 12px;
+        }
+
+        @media (max-width: 600px) {
+
+            .container {
+                width: 95%;
+                padding-top: 20px;
+            }
+
+            .header h1 {
+                font-size: 30px;
+            }
+
+            .main-card {
+                padding: 15px;
+                border-radius: 18px;
+            }
+
+            .tools {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+        }
+
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <div class="header">
+        <h1>Khaled AI Agency</h1>
+        <p>Architectural Visualization Prompt Generator</p>
+    </div>
+
+
+    <div class="main-card">
+
+        <!-- ========================= -->
+        <!-- IMAGE UPLOAD -->
+        <!-- ========================= -->
+
+        <div class="upload-area" id="uploadArea">
+
+            <div class="upload-content" id="uploadContent">
+
+                <div class="upload-icon">
+                    🖼️
+                </div>
+
+                <div class="upload-title">
+                    Upload Reference Image
+                </div>
+
+                <div class="upload-subtitle">
+                    Click here or drag an architectural image here
+                </div>
+
+            </div>
+
+            <img id="preview">
+
+            <button
+                class="remove-image"
+                id="removeImage"
+                type="button"
+            >
+                ×
+            </button>
+
+        </div>
+
+        <input
+            type="file"
+            id="imageInput"
+            accept="image/png,image/jpeg,image/webp"
+        >
+
+
+        <!-- ========================= -->
+        <!-- OPTIONAL INSTRUCTION -->
+        <!-- ========================= -->
+
+        <div class="section">
+
+            <div class="section-title">
+                Additional Instructions
+                <span class="optional">
+                    (optional)
+                </span>
+            </div>
+
+            <textarea
+                id="instruction"
+                placeholder="Example: Make the materials more realistic and add warm interior lighting..."
+            ></textarea>
+
+        </div>
+
+
+        <!-- ========================= -->
+        <!-- TOOLS -->
+        <!-- ========================= -->
+
+        <div class="section">
+
+            <div class="section-title">
+                Architectural Tool
+            </div>
+
+            <div class="tools">
+
+                <button
+                    class="tool-button active"
+                    data-tool="View to Render"
+                >
+                    View to Render
+                </button>
+
+                <button
+                    class="tool-button"
+                    data-tool="Closeup"
+                >
+                    Closeup
+                </button>
+
+                <button
+                    class="tool-button"
+                    data-tool="Day to Night"
+                >
+                    Day to Night
+                </button>
+
+                <button
+                    class="tool-button"
+                    data-tool="Night to Day"
+                >
+                    Night to Day
+                </button>
+
+                <button
+                    class="tool-button"
+                    data-tool="Add People"
+                >
+                    Add People
+                </button>
+
+                <button
+                    class="tool-button"
+                    data-tool="Blurred People"
+                >
+                    Blurred People
+                </button>
+
+                <button
+                    class="tool-button"
+                    data-tool="Golden Hour"
+                >
+                    Golden Hour
+                </button>
+
+                <button
+                    class="tool-button"
+                    data-tool="Add Cars"
+                >
+                    Add Cars
+                </button>
+
+                <button
+                    class="tool-button"
+                    data-tool="Blurred Cars"
+                >
+                    Blurred Cars
+                </button>
+
+                <button
+                    class="tool-button"
+                    data-tool="Blueprint"
+                >
+                    Blueprint
+                </button>
+
+                <button
+                    class="tool-button"
+                    data-tool="Axonometry"
+                >
+                    Axonometry
+                </button>
+
+                <button
+                    class="tool-button"
+                    data-tool="3D Hand-Drawn Axonometry"
+                >
+                    3D Hand-Drawn Axonometry
+                </button>
+
+                <button
+                    class="tool-button"
+                    data-tool="Cross-Section / Axonometry"
+                >
+                    Cross-Section / Axonometry
+                </button>
+
+            </div>
+
+        </div>
+
+
+        <!-- ========================= -->
+        <!-- GENERATE -->
+        <!-- ========================= -->
+
+        <button
+            class="generate"
+            id="generateButton"
+        >
+            Generate Structured Prompt
+        </button>
+
+        <div
+            class="status"
+            id="status"
+        ></div>
+
+
+        <!-- ========================= -->
+        <!-- RESULT -->
+        <!-- ========================= -->
+
+        <div
+            class="result"
+            id="result"
+        >
+
+            <div class="result-header">
+
+                <div class="result-title">
+                    Generated Prompt
+                </div>
+
+                <button
+                    class="copy-button"
+                    id="copyButton"
+                >
+                    Copy
+                </button>
+
+            </div>
+
+            <div id="resultText"></div>
+
+        </div>
+
+    </div>
+
+
+    <div class="footer">
+        Khaled AI Agency • Local AI powered by Ollama
+    </div>
+
+</div>
+
+
+<script>
+
+    // =========================
+    // ELEMENTS
+    // =========================
+
+    const uploadArea =
+        document.getElementById("uploadArea");
+
+    const uploadContent =
+        document.getElementById("uploadContent");
+
+    const imageInput =
+        document.getElementById("imageInput");
+
+    const preview =
+        document.getElementById("preview");
+
+    const removeImage =
+        document.getElementById("removeImage");
+
+    const instruction =
+        document.getElementById("instruction");
+
+    const generateButton =
+        document.getElementById("generateButton");
+
+    const status =
+        document.getElementById("status");
+
+    const result =
+        document.getElementById("result");
+
+    const resultText =
+        document.getElementById("resultText");
+
+    const copyButton =
+        document.getElementById("copyButton");
+
+
+    let selectedTool = "View to Render";
+    let selectedImage = null;
+
+
+    // =========================
+    // OPEN FILE PICKER
+    // =========================
+
+    uploadArea.addEventListener("click", function(e) {
+
+        if (
+            e.target === removeImage ||
+            e.target.closest("#removeImage")
+        ) {
+            return;
+        }
+
+        imageInput.click();
+
+    });
+
+
+    // =========================
+    // IMAGE SELECTED
+    // =========================
+
+    imageInput.addEventListener("change", function() {
+
+        const file = this.files[0];
+
+        if (!file) {
+            return;
+        }
+
+        selectedImage = file;
+
+        const url = URL.createObjectURL(file);
+
+        preview.src = url;
+
+        preview.style.display = "block";
+
+        uploadContent.style.display = "none";
+
+        removeImage.style.display = "block";
+
+    });
+
+
+    // =========================
+    // REMOVE IMAGE
+    // =========================
+
+    removeImage.addEventListener("click", function(e) {
+
+        e.stopPropagation();
+
+        selectedImage = null;
+
+        imageInput.value = "";
+
+        preview.src = "";
+
+        preview.style.display = "none";
+
+        uploadContent.style.display = "block";
+
+        removeImage.style.display = "none";
+
+    });
+
+
+    // =========================
+    // DRAG AND DROP
+    // =========================
+
+    uploadArea.addEventListener("dragover", function(e) {
+
+        e.preventDefault();
+
+        uploadArea.style.borderColor = "#aaa";
+
+    });
+
+
+    uploadArea.addEventListener("dragleave", function() {
+
+        uploadArea.style.borderColor = "#555";
+
+    });
+
+
+    uploadArea.addEventListener("drop", function(e) {
+
+        e.preventDefault();
+
+        uploadArea.style.borderColor = "#555";
+
+        const file = e.dataTransfer.files[0];
+
+        if (!file) {
+            return;
+        }
+
+        if (!file.type.startsWith("image/")) {
+            alert("Please upload an image file.");
+            return;
+        }
+
+        selectedImage = file;
+
+        const dataTransfer = new DataTransfer();
+
+        dataTransfer.items.add(file);
+
+        imageInput.files = dataTransfer.files;
+
+        const url = URL.createObjectURL(file);
+
+        preview.src = url;
+
+        preview.style.display = "block";
+
+        uploadContent.style.display = "none";
+
+        removeImage.style.display = "block";
+
+    });
+
+
+    // =========================
+    // TOOL BUTTONS
+    // =========================
+
+    document
+        .querySelectorAll(".tool-button")
+        .forEach(function(button) {
+
+            button.addEventListener("click", function() {
+
+                document
+                    .querySelectorAll(".tool-button")
+                    .forEach(function(btn) {
+                        btn.classList.remove("active");
+                    });
+
+                this.classList.add("active");
+
+                selectedTool =
+                    this.getAttribute("data-tool");
+
+            });
+
+        });
+
+
+    // =========================
+    // GENERATE
+    // =========================
+
+    generateButton.addEventListener("click", async function() {
+
+        if (!selectedImage) {
+
+            alert(
+                "Please upload a reference image first."
+            );
+
+            return;
+        }
+
+
+        generateButton.disabled = true;
+
+        status.textContent =
+            "Analyzing the image and generating your structured prompt...";
+
+        result.style.display = "none";
+
+
+        const formData = new FormData();
+
+        formData.append(
+            "image",
+            selectedImage
+        );
+
+        formData.append(
+            "instruction",
+            instruction.value
+        );
+
+        formData.append(
+            "tool",
+            selectedTool
+        );
+
+
+        try {
+
+            const response = await fetch(
+                "/api/generate",
+                {
+                    method: "POST",
+                    body: formData
+                }
+            );
+
+
+            // Read the response as text first.
+            // This prevents "Unexpected token <" / "Unexpected DOCTYPE"
+            // when a tunnel/proxy/server returns an HTML error page.
+            const responseText = await response.text();
+
+            let data;
+
+            try {
+                data = JSON.parse(responseText);
+            } catch (parseError) {
+                console.error("Non-JSON server response:", responseText);
+
+                if (responseText.trim().startsWith("<!DOCTYPE") ||
+                    responseText.trim().startsWith("<html") ||
+                    responseText.trim().startsWith("<")) {
+                    throw new Error(
+                        "The server returned an HTML page instead of JSON. " +
+                        "Make sure the public tunnel points to port 5000 and that Flask is running."
+                    );
+                }
+
+                throw new Error(
+                    "The server returned an invalid response: " +
+                    responseText.substring(0, 300)
+                );
+            }
+
+            if (!response.ok) {
+                throw new Error(
+                    data.error ||
+                    data.details ||
+                    "Something went wrong."
+                );
+            }
+
+            if (!data.success || !data.prompt) {
+                throw new Error(
+                    data.error ||
+                    "The server did not return a generated prompt."
+                );
+            }
+
+            resultText.textContent =
+                data.prompt;
+
+            result.style.display =
+                "block";
+
+            status.textContent =
+                "Prompt generated successfully.";
+
+        }
+
+        catch (error) {
+
+            console.error(error);
+
+            status.textContent =
+                "Error: " + error.message;
+
+        }
+
+        finally {
+
+            generateButton.disabled =
+                false;
+
+        }
+
+    });
+
+
+    // =========================
+    // COPY
+    // =========================
+
+    copyButton.addEventListener("click", async function() {
+
+        const text =
+            resultText.textContent;
+
+        try {
+            await navigator.clipboard.writeText(text);
+            copyButton.textContent = "Copied!";
+        } catch (error) {
+            // Fallback for browsers/tunnels where Clipboard API is unavailable.
+            const temp = document.createElement("textarea");
+            temp.value = text;
+            document.body.appendChild(temp);
+            temp.select();
+            document.execCommand("copy");
+            temp.remove();
+            copyButton.textContent = "Copied!";
+        }
+
+        setTimeout(function() {
+            copyButton.textContent = "Copy";
+        }, 1500);
+
+    });
+
+</script>
+
+</body>
+</html>
